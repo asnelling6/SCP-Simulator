@@ -36,18 +36,18 @@ def SCP_Decision(input_stack, input_request, k): #Given an intial stack ordering
     #if (k==2):
     #    print("Size "+str(k)+" cache containing "+str(cache)+" evicts " + str(i))
 
-    for i in cache:
+    for i in reversed(cache):
         if (i.value == lowest_priority):
             cache.remove(i)
             cache.append(request)
             return cache
-    #Finds the value to be evicted, and returns the new cache. As of right now, breaks ties by choosing the item higher up in the stack ordering.
+    #Finds the value to be evicted, and returns the new cache. As of right now, breaks ties by choosing the item lower down in the stack ordering.
     print("Something has gone terribly wrong. Ruh Roh!")
     print(cache)
     print(lowest_priority)
     print(request)
 
-def SCP_Find_Permutations(trace): #takes list of Items as input and returns dictionary of permutation/trace pairs.
+def SCP_Find_Permutations(trace): #takes list of Items as input and returns a dictionary of all generated permutations as key, trace as value.
     #distinct_items = []
     #distinct_items_count = 0
     #for i in trace:
@@ -55,8 +55,9 @@ def SCP_Find_Permutations(trace): #takes list of Items as input and returns dict
     #        distinct_items.append(i)
     #        distinct_items_count+=1
     #print(distinct_items)
+    
 
-    permutations = {} #dictionary with permutations as keys and the trace that generated it as values
+    permutations = {} #list of permutations
     stack = [] #list of Items
     trace_copy = copy.deepcopy(trace)
 
@@ -176,9 +177,26 @@ def SCP_Find_Permutations(trace): #takes list of Items as input and returns dict
         #for debugging purposes
 
 
+    #The below section removes transpositions if they follow the rule of halves. Comment out if you want all of the possibilities.
+    #===========================================================
+    #prev_cost = 0
+    #count=1
+
+
+    #for i in trace:
+    #    if (2*i.value < prev_cost):
+    #        count+=1
+    #    elif (count > 1):
+    #        permutations = {}
+    #    else:
+    #        pass
+    #    prev_cost = i.value
+    #if (count > 1):
+    #    permutations = {}
+    #===========================================================
     return permutations
 
-def SCP_Generate_And_Run_Traces(trace_length, max_distinct_items, max_cost, number_iterations): #Generates random traces and returns found permutations.
+def SCP_Generate_And_Run_Traces(trace_length, max_distinct_items, min_cost, max_cost, number_iterations): #Generates random traces and returns found permutations.
 
     total_permutations = {}
 
@@ -186,7 +204,7 @@ def SCP_Generate_And_Run_Traces(trace_length, max_distinct_items, max_cost, numb
     for i in range(1, number_iterations+1):
         distinct_items = []
         for j in range(65, max_distinct_items+65):
-            distinct_items.append(Item(str(chr(j)), random.randint(1, max_cost)))
+            distinct_items.append(Item(str(chr(j)), random.randint(min_cost, max_cost)))
         #print("Distinct items: " + str(distinct_items))
         new_trace = []
         for item in range(0, trace_length):
@@ -195,7 +213,9 @@ def SCP_Generate_And_Run_Traces(trace_length, max_distinct_items, max_cost, numb
         found_permutations = SCP_Find_Permutations(new_trace)
         total_permutations.update(found_permutations)
 
-    for i in total_permutations:
+    sortedList = sorted(total_permutations)
+    print("\n")
+    for i in sortedList:
         print(i + " with trace " +  str(total_permutations.get(i)))
 
 def SCP_steps(string_trace): #Expects a string of the format [A/1, B/3, C/1, etc.] and prints out step by step calculation
@@ -312,7 +332,9 @@ def SCP_steps(string_trace): #Expects a string of the format [A/1, B/3, C/1, etc
 #for i in final_dict:
 #    print(i + " with trace " +  str(final_dict.get(i)))
 
-SCP_Generate_And_Run_Traces(10, 5, 20, 10000)
+SCP_Generate_And_Run_Traces(5, 5, 9, 20, 10000)
 
 #SCP_steps("[A/16, B/6, B/6, E/1, A/16, D/4, C/9, E/1, B/6, A/16]")
 #SCP_steps("[C/9, A/16, B/6, B/6, E/1, A/16, D/4, C/9]")
+#SCP_steps("[D/19, A/9, E/2, A/9, A/9]")
+
